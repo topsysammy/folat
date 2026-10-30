@@ -30,9 +30,12 @@ export function Owing({ initial = "behind" }: { initial?: Tab }) {
           ? <p className="empty">Everyone is up to date 🎉</p>
           : (
             <>
-              <p className="lede">
-                {behind.length} {behind.length === 1 ? "customer owes" : "customers owe"} {naira(total)} in total. Tap{" "}
-                <b>Remind</b> to send a WhatsApp message from your own phone.
+              <p className="info">
+                <span className="icon-tile icon-tile-sm"><Icon name="chat" size={18} /></span>
+                <span>
+                  {behind.length} {behind.length === 1 ? "customer owes" : "customers owe"} {naira(total)}. Tap{" "}
+                  <b>Remind</b> to send a WhatsApp message from your own phone.
+                </span>
               </p>
               <ul className="list">
                 {behind.map((row) => (
@@ -41,7 +44,7 @@ export function Owing({ initial = "behind" }: { initial?: Tab }) {
                       <Avatar name={row.customer.name} />
                       <span className="list-main">
                         <span className="list-title">{row.customer.name}</span>
-                        <span className="list-sub">Owes {naira(row.progress.behindBy)} · paid {naira(row.progress.total)}</span>
+                        <span className="list-sub"><span className="status status-bad">Owes {naira(row.progress.behindBy)}</span></span>
                       </span>
                     </a>
                     <a className="btn btn-ink btn-sm" href={reminderLink(row.customer, row.progress.behindBy)} target="_blank"
@@ -57,9 +60,12 @@ export function Owing({ initial = "behind" }: { initial?: Tab }) {
         ? <p className="empty">Everyone has paid in the last {QUIET_DAYS} days.</p>
         : (
           <>
-            <p className="lede">
-              No payment in {QUIET_DAYS} days or more (monthly plans: a month and {QUIET_DAYS} days). Tap{" "}
-              <b>Check in</b> to ask how they're doing.
+            <p className="info">
+              <span className="icon-tile icon-tile-sm"><Icon name="clock" size={18} /></span>
+              <span>
+                No payment in {QUIET_DAYS} days or more (monthly plans: a month and {QUIET_DAYS} days). Tap{" "}
+                <b>Check in</b> to ask how they're doing.
+              </span>
             </p>
             <ul className="list">
               {quiet.map((row) => {

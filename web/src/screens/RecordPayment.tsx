@@ -26,7 +26,8 @@ function PickCustomer() {
   return (
     <>
       <TopBar title="Record payment" />
-      <p className="lede">Who paid?</p>
+      <h2 className="h-big">Who paid?</h2>
+      <p className="lede">Pick the customer, then enter the amount.</p>
       <label className="search">
         <Icon name="search" size={18} />
         <input autoFocus placeholder="Search name" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search customers" />
@@ -45,7 +46,10 @@ function PickCustomer() {
                     <span className="list-title">{c.name}</span>
                     <span className="list-sub"><span className="cap">{c.plan}</span> · {naira(planAmount(s.settings, c.plan))}</span>
                   </span>
-                  <span className="list-amount">{naira(p.total)}</span>
+                  <span className="list-end">
+                    <span className="list-amount">{naira(p.total)}</span>
+                    <span className="list-note">paid so far</span>
+                  </span>
                 </button>
               </li>
             ))}
@@ -129,21 +133,27 @@ function PaymentForm({ customerId }: { customerId: number }) {
           <p className="list-title">{c.name}</p>
           <p className="list-sub"><span className="cap">{c.plan}</span> plan · has paid {naira(p.total)}</p>
         </div>
+        <a className="change" href="#/pay">Change</a>
       </div>
 
       {step.kind === "form"
         ? (
           <form className="stack" onSubmit={review}>
-            <label className="field">
+            <label className="amount-big">
               <span>Amount</span>
-              <div className="amount-input">
-                <span aria-hidden="true">₦</span>
-                <input inputMode="numeric" value={amountText} onChange={(e) => setAmountText(e.target.value)} />
-              </div>
+              <span className="amount-big-row">
+                <b aria-hidden="true">₦</b>
+                <input inputMode="numeric" value={amountText} onChange={(e) => setAmountText(e.target.value)}
+                  style={{ width: `${Math.max(1, amountText.length) * 0.62 + 0.15}em` }} />
+              </span>
+              <small>Their {c.plan} amount is filled in. Change it if they paid more or less.</small>
             </label>
             <label className="field">
               <span>Date paid</span>
-              <input type="date" max={s.today} value={date} onChange={(e) => setDate(e.target.value)} />
+              <span className="input-icon">
+                <Icon name="cal" size={18} />
+                <input type="date" max={s.today} value={date} onChange={(e) => setDate(e.target.value)} />
+              </span>
             </label>
             <fieldset className="field">
               <legend>How they paid</legend>
@@ -157,8 +167,11 @@ function PaymentForm({ customerId }: { customerId: number }) {
               </div>
             </fieldset>
             <label className="field">
-              <span>Note <small className="hint">(optional)</small></span>
-              <input maxLength={120} placeholder="e.g. paid by her son" value={note} onChange={(e) => setNote(e.target.value)} />
+              <span>Note <span className="hint-opt">(optional)</span></span>
+              <span className="input-icon">
+                <Icon name="note" size={18} />
+                <input maxLength={120} placeholder="e.g. paid by her son" value={note} onChange={(e) => setNote(e.target.value)} />
+              </span>
             </label>
             {error && <p className="error" role="alert">{error}</p>}
             <button className="btn btn-ink btn-block">Continue</button>
@@ -166,19 +179,24 @@ function PaymentForm({ customerId }: { customerId: number }) {
         )
         : (
           <div className="stack">
-            <section className="review">
-              <p className="eyebrow">Check before saving</p>
+            <div>
+              <h2 className="h-big">Check before saving</h2>
+              <p className="lede">Make sure the amount and customer are right.</p>
+            </div>
+            <section className="review starry">
+              <p className="eyebrow">Payment</p>
               <p className="review-amount">{naira(step.amount)}</p>
-              <p>from <b>{c.name}</b> on <b>{date === s.today ? "today" : dayLabel(date)}</b></p>
-              <p className="muted">
-                {METHODS.find((m) => m.value === method)?.label}
-                {note.trim() && <> · “{note.trim()}”</>}
-              </p>
-              <p className="muted">New total: {naira(p.total + step.amount)}</p>
+              <p>from <b>{c.name}</b> {date === s.today ? "today" : <>on <b>{dayLabel(date)}</b></>}</p>
+              <div className="tags">
+                <span className="tag">{METHODS.find((m) => m.value === method)?.label}</span>
+                {note.trim() && <span className="tag">“{note.trim()}”</span>}
+              </div>
+              <span className="line" />
+              <p className="total"><span>New total</span><b>{naira(p.total + step.amount)}</b></p>
             </section>
             {error && <p className="error" role="alert">{error}</p>}
             <button className="btn btn-ink btn-block" disabled={busy} onClick={() => save(step.amount)}>
-              {busy ? "Saving…" : "Save payment"}
+              {busy ? "Saving…" : <><Icon name="check" stroke={2.2} /> Save payment</>}
             </button>
             <button className="btn btn-ghost btn-block" disabled={busy} onClick={() => setStep({ kind: "form" })}>
               Change it

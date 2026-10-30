@@ -5,6 +5,7 @@ import { parsePhone } from "@shared/parse/phone.ts";
 import { planAmount } from "@shared/progress.ts";
 import { type Customer, type IsoDate, type Plan, PLANS } from "@shared/types.ts";
 import { useStore } from "../store.tsx";
+import { Icon } from "../ui.tsx";
 
 export interface CustomerValues {
   name: string;
@@ -53,11 +54,18 @@ export function CustomerForm({ customer, withStart = false, submitLabel, onSubmi
     <form className="stack" onSubmit={submit}>
       <label className="field">
         <span>Full name</span>
-        <input autoComplete="off" autoCapitalize="words" value={name} onChange={(e) => setName(e.target.value)} />
+        <span className="input-icon">
+          <Icon name="user" size={18} />
+          <input autoComplete="off" autoCapitalize="words" value={name} onChange={(e) => setName(e.target.value)} />
+        </span>
+        <small className="hint">Add a surname or initial if two customers share a name.</small>
       </label>
       <label className="field">
-        <span>Phone number</span>
-        <input type="tel" inputMode="tel" placeholder="0801 234 5678" value={phone} onChange={(e) => setPhone(e.target.value)} />
+        <span>WhatsApp number</span>
+        <span className="input-icon">
+          <Icon name="phone" size={18} />
+          <input type="tel" inputMode="tel" placeholder="0801 234 5678" value={phone} onChange={(e) => setPhone(e.target.value)} />
+        </span>
       </label>
       <fieldset className="field">
         <legend>Plan</legend>
@@ -66,15 +74,18 @@ export function CustomerForm({ customer, withStart = false, submitLabel, onSubmi
             <label key={p} className={plan === p ? "on" : ""}>
               <input type="radio" name="plan" value={p} checked={plan === p} onChange={() => setPlan(p)} />
               <span className="cap">{p}</span>
-              <small>{naira(planAmount(s.settings, p))}</small>
+              <small>{naira(planAmount(s.settings, p))} a {p === "daily" ? "day" : p === "weekly" ? "week" : "month"}</small>
             </label>
           ))}
         </div>
       </fieldset>
       {withStart && (
         <label className="field">
-          <span>Started saving on</span>
-          <input type="date" max={s.today} value={start} onChange={(e) => setStart(e.target.value)} />
+          <span>Started saving</span>
+          <span className="input-icon">
+            <Icon name="cal" size={18} />
+            <input type="date" max={s.today} value={start} onChange={(e) => setStart(e.target.value)} />
+          </span>
           <small className="hint">Pick an earlier date if they joined before today. It sets what they should have paid by now.</small>
         </label>
       )}

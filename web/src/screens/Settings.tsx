@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { naira } from "@shared/money.ts";
 import { parseAmount } from "@shared/parse/amount.ts";
 import { dayLabel } from "@shared/time.ts";
 import { db, type EditableSettings, saveSettings } from "../api.ts";
 import { useStore } from "../store.tsx";
-import { go, Icon, longDate, TopBar } from "../ui.tsx";
+import { go, Icon, longDate, PageTitle } from "../ui.tsx";
 
 /** The values the app started with. The distribution day stays in this season's year. */
 const defaults = (distributionDate: string): EditableSettings => ({
@@ -16,7 +16,7 @@ const defaults = (distributionDate: string): EditableSettings => ({
 });
 
 const FIELDS: { key: Exclude<keyof EditableSettings, "distribution_date">; label: string; hint: string }[] = [
-  { key: "target", label: "Savings target per customer", hint: "What each customer saves towards by December" },
+  { key: "target", label: "Savings target", hint: "Per customer, by December" },
   { key: "daily_amount", label: "Daily plan", hint: "Paid every day" },
   { key: "weekly_amount", label: "Weekly plan", hint: "Paid every week" },
   { key: "monthly_amount", label: "Monthly plan", hint: "Paid every month" },
@@ -36,6 +36,10 @@ export function Settings() {
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState<string | null>(null);
   const pastSeasons = s.seasons.filter((x) => x.id !== s.season.id);
+  const [email, setEmail] = useState("");
+  useEffect(() => {
+    db.auth.getSession().then(({ data }) => setEmail(data.session?.user.email ?? ""));
+  }, []);
 
   const write = async (v: EditableSettings, message: string) => {
     setBusy(true);
@@ -80,69 +84,76 @@ export function Settings() {
 
   return (
     <>
-      <TopBar title="Settings" />
+      <PageTitle eyebrow={`Season ${s.season.name}`} title="Settings" />
+      <div className="profile">
+        <span className="avatar avatar-lg" style={{ background: "#f3e8cf", width: 52, height: 52, borderRadius: 16, fontSize: 18 }}
+          aria-hidden="true">FP</span>
+        <span>
+          <b>Folat Place</b>
+          <small>{email}</small>
+        </span>
+      </div>
 
+      <div className="section-head"><h2>Savings plan</h2></div>
       <form className="stack" onSubmit={submit}>
-        {FIELDS.map((f) => (
-          <label key={f.key} className="field">
-            <span>{f.label}</span>
-            <div className="amount-input amount-input-sm">
-              <span aria-hidden="true">₦</span>
-              <input id={f.key} inputMode="numeric" value={form[f.key]}
-                onChange={(e) => setForm({ ...form, [f.key]: e.target.value })} />
-            </div>
-            <small className="hint">{f.hint}</small>
+        <div className="set-rows">
+          {FIELDS.map((f) => (
+            <label key={f.key} className="set-row">
+              <span><b>{f.label}</b><small>{f.hint}</small></span>
+              <span className="set-input">
+                <i aria-hidden="true">₦</i>
+                <input id={f.key} inputMode="numeric" value={form[f.key]} aria-label={f.label}
+                  onChange={(e) => setForm({ ...form, [f.key]: e.target.value })} />
+              </span>
+            </label>
+          ))}
+          <label className="set-row">
+            <span><b>Distribution day</b><small>Countdown on Home</small></span>
+            <span className="set-input">
+              <input type="date" value={form.distribution_date} aria-label="Distribution day"
+                onChange={(e) => setForm({ ...form, distribution_date: e.target.value })} />
+            </span>
           </label>
-        ))}
-        <label className="field">
-          <span>Distribution day</span>
-          <input type="date" value={form.distribution_date}
-            onChange={(e) => setForm({ ...form, distribution_date: e.target.value })} />
-          <small className="hint">Used for “on track for December” and the countdown on Home.</small>
-        </label>
-        <p className="hint">
-          Changing a plan amount changes what every customer on that plan should have paid by now.
-        </p>
+        </div>
+        <p className="hint">Changing a plan amount changes what every customer on that plan should have paid by now.</p>
         {error && <p className="error" role="alert">{error}</p>}
         {saved && <p className="ok" role="status">{saved}</p>}
-        <button className="btn btn-ink btn-block" disabled={busy}>{busy ? "Saving…" : "Save changes"}</button>
-        <button type="button" className="btn btn-ghost btn-block" disabled={busy} onClick={reset}>
-          Reset to original values
-        </button>
+        <div className="row-2">
+          <button type="button" className="btn btn-ghost" disabled={busy} onClick={reset}>
+            <Icon name="refresh" size={18} /> Reset
+          </button>
+          <button className="btn btn-ink" disabled={busy}>{busy ? "Saving…" : "Save changes"}</button>
+        </div>
       </form>
 
-      <div className="section-head"><h2>Payments from before the app</h2></div>
-      <p className="hint">Add what customers paid on WhatsApp before she started using the app.</p>
-      <button className="btn btn-ghost btn-block gap-top" onClick={() => go("/old")}>Add old payments</button>
+      <div className="section-head"><h2>Before the app</h2></div>
+      <button className="link-card" onClick={() => go("/old")}>
+        <span className="icon-tile" style={{ background: "#d9eedf" }}><Icon name="chat" /></span>
+        <span><b>Add old payments</b><small>From her WhatsApp chats</small></span>
+        <Icon name="chevron" size={18} />
+      </button>
 
       <div className="section-head"><h2>Season</h2></div>
-      <dl className="facts">
+      <dl className="facts" style={{ marginTop: 0 }}>
         <div><dt>Current season</dt><dd>{s.season.name}</dd></div>
         <div><dt>Started</dt><dd>{longDate(s.season.started_on)}</dd></div>
         <div><dt>Distribution</dt><dd>{longDate(s.settings.distribution_date)}</dd></div>
+        <span className="sep" />
+        <a className="link-card" href="#/season/new" style={{ padding: 0 }}>
+          <span className="icon-tile"><Icon name="refresh" /></span>
+          <span><b>Start a new season</b><small>Close {s.season.name} and start again from ₦0</small></span>
+          <Icon name="chevron" size={18} />
+        </a>
       </dl>
-      <button className="btn btn-ghost btn-block gap-top" onClick={() => go("/season/new")}>Start a new season</button>
+      {pastSeasons.map((x) => (
+        <a key={x.id} className="link-card gap-top" href={`#/seasons/${x.id}`}>
+          <span className="icon-tile" style={{ background: "#e4ddf6" }}><Icon name="archive" /></span>
+          <span><b>Season {x.name}</b><small>{longDate(x.started_on)} to {longDate(x.distribution_date)}</small></span>
+          <Icon name="chevron" size={18} />
+        </a>
+      ))}
 
-      {pastSeasons.length > 0 && (
-        <>
-          <div className="section-head"><h2>Past seasons</h2></div>
-          <ul className="list">
-            {pastSeasons.map((x) => (
-              <li key={x.id}>
-                <a className="list-row" href={`#/seasons/${x.id}`}>
-                  <span className="list-main">
-                    <span className="list-title">{x.name}</span>
-                    <span className="list-sub">{longDate(x.started_on)} to {longDate(x.distribution_date)}</span>
-                  </span>
-                  <Icon name="chevron" />
-                </a>
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-
-      <button className="btn btn-ghost btn-block signout" onClick={() => db.auth.signOut({ scope: "local" })}>
+      <button className="btn btn-danger-ghost btn-block signout" onClick={() => db.auth.signOut({ scope: "local" })}>
         <Icon name="logout" /> Sign out
       </button>
     </>

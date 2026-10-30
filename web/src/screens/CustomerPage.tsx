@@ -7,7 +7,7 @@ import { METHODS, undoPayment, updateCustomer } from "../api.ts";
 import { statementLink } from "../messages.ts";
 import { useStore } from "../store.tsx";
 import { CustomerForm } from "./CustomerForm.tsx";
-import { go, Icon, Segments, StatusPill, TopBar } from "../ui.tsx";
+import { Avatar, DateTile, go, Icon, Segments, StatusPill, TopBar } from "../ui.tsx";
 
 export function CustomerPage({ id }: { id: number }) {
   const s = useStore();
@@ -78,9 +78,9 @@ export function CustomerPage({ id }: { id: number }) {
   return (
     <>
       <TopBar
-        title={c.name}
+        title="Customer"
         fallback="/customers"
-        action={<button className="icon-btn icon-btn-soft" onClick={() => setEditing(true)} aria-label="Edit customer"><Icon name="edit" /></button>}
+        action={<button className="icon-btn icon-btn-soft" onClick={() => setEditing(true)} aria-label="Edit customer"><Icon name="edit" size={19} /></button>}
       />
 
       {!c.active && (
@@ -90,38 +90,57 @@ export function CustomerPage({ id }: { id: number }) {
         </div>
       )}
 
-      <section className="hero-card">
-        <div className="hero-top">
-          <p className="eyebrow">Total paid</p>
-          <span className="tag cap">{c.plan} · {naira(planAmount(s.settings, c.plan))}</span>
+      <div className="who-big">
+        <Avatar name={c.name} size="lg" dim={!c.active} />
+        <div>
+          <p className="who-name">{c.name}</p>
+          <p className="muted"><span className="cap">{c.plan}</span> plan · {naira(planAmount(s.settings, c.plan))} a {c.plan === "daily" ? "day" : c.plan === "weekly" ? "week" : "month"}</p>
         </div>
-        <span className="amount-xl">{naira(p.total)}</span>
-        <Segments value={p.total} of={s.settings.target} dark />
-        <p className="hero-sub">
-          {p.left > 0
-            ? `${naira(p.left)} left of the ${naira(s.settings.target)} target`
-            : p.surplus > 0
-            ? `Target reached, ${naira(p.surplus)} extra`
-            : "Target reached"}
-        </p>
-        {c.active && (
-          <div className="hero-actions">
-            <button className="btn btn-white" onClick={() => go(`/pay/${id}`)}><Icon name="plus" /> Record payment</button>
-            {p.behindBy > 0 && (
-              <a className="btn btn-smoke" href={reminderLink(c, p.behindBy)} target="_blank" rel="noreferrer">
-                <Icon name="chat" /> Remind
-              </a>
-            )}
-          </div>
+        <a className="icon-btn icon-btn-soft" href={`tel:${localPhone(c.phone)}`} aria-label={`Call ${c.name}`}><Icon name="phone" size={19} /></a>
+      </div>
+
+      <section className="balance">
+        <p className="balance-label">Total paid</p>
+        <div className="balance-amount"><b>{naira(p.total)}</b></div>
+        {p.left > 0 && p.behindBy > 0 && (
+          <p className="small-inline">
+            <span className="status status-bad"><Icon name="clock" size={15} stroke={2.2} /> Behind {naira(p.behindBy)}</span>
+            <span className="muted"> · expected {naira(p.expected)} by now</span>
+          </p>
         )}
+        <div className="balance-foot">
+          <Segments value={p.total} of={s.settings.target} />
+          <p>
+            {p.left > 0
+              ? `${naira(p.left)} left of the ${naira(s.settings.target)} target`
+              : p.surplus > 0
+              ? `Target reached, ${naira(p.surplus)} extra`
+              : "Target reached"}
+          </p>
+        </div>
       </section>
 
+      {c.active && (
+        <div className="actions gap-top">
+          <button className="btn btn-ink" onClick={() => go(`/pay/${id}`)}><Icon name="plus" stroke={2.2} /> Record payment</button>
+          {p.behindBy > 0 && (
+            <a className="btn btn-ghost" href={reminderLink(c, p.behindBy)} target="_blank" rel="noreferrer">
+              <Icon name="chat" /> Remind
+            </a>
+          )}
+        </div>
+      )}
+
       <dl className="facts">
-        <div><dt>Status</dt><dd><StatusPill p={p} /></dd></div>
+        <div><dt>Status</dt><dd><StatusPill p={p} pill /></dd></div>
         <div><dt>Expected by now</dt><dd>{naira(p.expected)}</dd></div>
         <div>
           <dt>December</dt>
-          <dd>{p.onTrack ? "On track" : `Not on track · ${naira(p.projected)} at this pace`}</dd>
+          <dd>
+            {p.onTrack
+              ? <span className="green">On track</span>
+              : <><span className="red">Not on track</span><small>{naira(p.projected)} at this pace</small></>}
+          </dd>
         </div>
         <div><dt>Started</dt><dd>{dayLabel(c.start_date)}</dd></div>
         <div><dt>Phone</dt><dd><a href={`tel:${localPhone(c.phone)}`}>{localPhone(c.phone)}</a></dd></div>
@@ -130,11 +149,11 @@ export function CustomerPage({ id }: { id: number }) {
         target="_blank" rel="noreferrer">
         <Icon name="chat" /> Send statement on WhatsApp
       </a>
-      {error && <p className="error" role="alert">{error}</p>}
+      {error && <p className="error gap-top" role="alert">{error}</p>}
 
       <div className="section-head">
         <h2>History</h2>
-        {c.active && <a href={`#/old/${id}`}>+ Old payments</a>}
+        {c.active && <a className="strong" href={`#/old/${id}`}>+ Old payments</a>}
       </div>
       {history.length === 0
         ? <p className="empty">No payments yet.</p>
@@ -145,6 +164,7 @@ export function CustomerPage({ id }: { id: number }) {
               return (
                 <li key={x.id} className="list-row">
                   <a className="list-link" href={`#/payment/${x.id}`}>
+                  <DateTile date={lagosDate(x.paid_at)} />
                   <span className="list-main">
                     <span className="list-title">{dayLabel(lagosDate(x.paid_at))}</span>
                     <span className="list-sub">
@@ -162,7 +182,7 @@ export function CustomerPage({ id }: { id: number }) {
                   </span>
                   </a>
                   {x.source !== "undo" && !reversed && (
-                    <button className="icon-btn icon-btn-soft icon-btn-sm" disabled={busy}
+                    <button className="icon-btn icon-btn-white icon-btn-sm" disabled={busy}
                       onClick={() => undo(x.id, x.amount, x.paid_at)} aria-label={`Undo ${naira(x.amount)} payment`}>
                       <Icon name="undo" size={16} />
                     </button>

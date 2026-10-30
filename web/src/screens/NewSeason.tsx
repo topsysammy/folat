@@ -58,7 +58,7 @@ export function NewSeason() {
   return (
     <>
       <TopBar title="New season" fallback="/settings" />
-      <section className="review review-left">
+      <section className="review review-left starry">
         <p className="eyebrow">What happens</p>
         <p>
           Season <b>{s.season.name}</b> ({naira(s.collected)} collected) is closed and kept as a past season you can open
@@ -78,11 +78,17 @@ export function NewSeason() {
         </label>
         <label className="field">
           <span>Starts on</span>
-          <input type="date" value={start} onChange={(e) => setStart(e.target.value)} />
+          <span className="input-icon">
+            <Icon name="cal" size={18} />
+            <input type="date" value={start} onChange={(e) => setStart(e.target.value)} />
+          </span>
         </label>
         <label className="field">
           <span>Distribution day</span>
-          <input type="date" value={distribution} onChange={(e) => setDistribution(e.target.value)} />
+          <span className="input-icon">
+            <Icon name="cal" size={18} />
+            <input type="date" value={distribution} onChange={(e) => setDistribution(e.target.value)} />
+          </span>
           <small className="hint">{distribution && `Customers save towards ${longDate(distribution)}.`}</small>
         </label>
         <fieldset className="field">

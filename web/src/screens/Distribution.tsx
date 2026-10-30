@@ -46,14 +46,17 @@ export function Distribution() {
   return (
     <>
       <TopBar title="Distribution" />
-      <section className="hero-card">
+      <section className="hero-card starry">
         <div className="hero-top">
           <p className="eyebrow">Collected their food</p>
           <span className="tag">
-            {daysLeft > 0 ? `${longDate(s.settings.distribution_date)} · in ${daysLeft} days` : longDate(s.settings.distribution_date)}
+            {daysLeft > 0 ? `${shortDate(s.settings.distribution_date)} · in ${daysLeft} days` : daysLeft === 0 ? `${shortDate(s.settings.distribution_date)} · today` : longDate(s.settings.distribution_date)}
           </span>
         </div>
-        <span className="amount-xl">{s.distributions.length} of {savers.length}</span>
+        <p className="hero-big">
+          <span className="amount-xl">{s.distributions.length}</span>
+          <small>of {savers.length} customer{savers.length === 1 ? "" : "s"}</small>
+        </p>
         <Segments value={s.distributions.length} of={savers.length} dark />
         <p className="hero-sub">{naira(handedOut)} of savings handed out · {waiting.length} still to come</p>
       </section>
@@ -77,7 +80,7 @@ export function Distribution() {
             : (
               <ul className="list">
                 {waiting.filter((r) => match(r.customer.name)).map((r) => (
-                  <li key={r.customer.id} className="dist-item">
+                  <li key={r.customer.id} className={open === r.customer.id ? "dist-open" : undefined}>
                     <div className="list-row">
                       <Avatar name={r.customer.name} />
                       <span className="list-main">
@@ -92,21 +95,21 @@ export function Distribution() {
                           setOpen(r.customer.id);
                           setItems("");
                         }}>
-                          <Icon name="check" size={16} /> Collected
+                          <Icon name="check" size={15} stroke={2.2} /> Collected
                         </button>
                       )}
                     </div>
                     {open === r.customer.id && (
                       <div className="dist-form">
                         <label className="field">
-                          <span>What they received <small className="hint">(optional)</small></span>
+                          <span>What they received <span className="hint-opt">(optional)</span></span>
                           <input autoFocus maxLength={160} placeholder="e.g. 1 bag rice, 2 tins oil, 1 carton noodles"
                             value={items} onChange={(e) => setItems(e.target.value)} />
                         </label>
                         <div className="row-2">
                           <button className="btn btn-ghost" disabled={busy} onClick={() => setOpen(null)}>Cancel</button>
                           <button className="btn btn-ink" disabled={busy} onClick={() => collect(r)}>
-                            {busy ? "Saving…" : "Mark collected"}
+                            {busy ? "Saving…" : <><Icon name="check" size={17} stroke={2.2} /> Mark collected</>}
                           </button>
                         </div>
                       </div>
@@ -135,7 +138,7 @@ export function Distribution() {
                             {d.items && ` · ${d.items}`}
                           </span>
                         </span>
-                        <button className="icon-btn icon-btn-soft icon-btn-sm" disabled={busy}
+                        <button className="icon-btn icon-btn-white icon-btn-sm" disabled={busy}
                           aria-label={`Undo: ${name} has not collected`}
                           onClick={() => {
                             if (confirm(`Mark ${name} as not collected yet?`)) run(() => untickCollected(d.id));

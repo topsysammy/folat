@@ -6,6 +6,7 @@ import type { IsoDate } from "@shared/types.ts";
 import { deletePayment, editPayment, type Method, METHODS, undoPayment } from "../api.ts";
 import { useStore } from "../store.tsx";
 import { Avatar, back, Icon, TopBar } from "../ui.tsx";
+import { lagosTime } from "./Today.tsx";
 
 /** One payment: see it, edit it, undo it (crossed out) or delete it for good. */
 export function PaymentPage({ id }: { id: number }) {
@@ -60,20 +61,23 @@ export function PaymentPage({ id }: { id: number }) {
   return (
     <>
       <TopBar title={isUndo ? "Undo entry" : "Payment"} fallback={`/customers/${p.customer_id}`} />
-      <section className="review">
+      <section className="pay-hero">
+        <Avatar name={name} size="lg" dim={isUndo || undone} />
         <p className="eyebrow">{isUndo ? "Undo of an earlier payment" : undone ? "Undone" : "Payment"}</p>
         <p className={`review-amount${undone ? " struck" : ""}`}>{naira(p.amount)}</p>
-        <p>from <a href={`#/customers/${p.customer_id}`}><b>{name}</b></a> on <b>{dayLabel(date)}</b></p>
-        {!isUndo && (
-          <p className="muted">
-            {METHODS.find((m) => m.value === p.method)?.label ?? "Method not recorded"}
-            {p.note && <> · “{p.note}”</>}
-          </p>
-        )}
+        <p>from <a href={`#/customers/${p.customer_id}`}>{name}</a></p>
       </section>
+      <dl className="facts">
+        <div><dt>Date</dt><dd>{dayLabel(date)}</dd></div>
+        <div><dt>Time</dt><dd>{lagosTime(p.paid_at)}</dd></div>
+        {!isUndo && (
+          <div><dt>Method</dt><dd>{METHODS.find((m) => m.value === p.method)?.label ?? "Not recorded"}</dd></div>
+        )}
+        {p.note && <div><dt>Note</dt><dd>“{p.note}”</dd></div>}
+      </dl>
 
       {error && <p className="error gap-top" role="alert">{error}</p>}
-      <div className="stack gap-top">
+      <div className="stack gap-top" style={{ gap: 10 }}>
         {!isUndo && (
           <button className="btn btn-ink btn-block" disabled={busy} onClick={() => setEditing(true)}>
             <Icon name="edit" /> Edit payment
@@ -88,6 +92,11 @@ export function PaymentPage({ id }: { id: number }) {
           <Icon name="trash" /> {isUndo ? "Delete undo entry" : "Delete payment"}
         </button>
       </div>
+      {!isUndo && (
+        <p className="hint gap-top" style={{ textAlign: "center" }}>
+          Undo keeps it in the history, crossed out. Delete erases it completely.
+        </p>
+      )}
     </>
   );
 }
@@ -151,10 +160,11 @@ function EditPayment({ id, onDone }: { id: number; onDone: () => void }) {
         <label className="field">
           <span>Customer</span>
           <div className="select-wrap">
-            <Avatar name={customer.name} />
+            <Avatar name={customer.name} size="sm" />
             <select value={customerId} onChange={(e) => setCustomerId(Number(e.target.value))}>
               {choices.map((c) => <option key={c.id} value={c.id}>{c.name}{c.active ? "" : " (removed)"}</option>)}
             </select>
+            <Icon name="down" size={18} />
           </div>
         </label>
         <label className="field">
@@ -166,7 +176,10 @@ function EditPayment({ id, onDone }: { id: number; onDone: () => void }) {
         </label>
         <label className="field">
           <span>Date paid</span>
-          <input type="date" max={s.today} value={date} onChange={(e) => setDate(e.target.value)} />
+          <span className="input-icon">
+            <Icon name="cal" size={18} />
+            <input type="date" max={s.today} value={date} onChange={(e) => setDate(e.target.value)} />
+          </span>
         </label>
         <fieldset className="field">
           <legend>How they paid</legend>
@@ -180,8 +193,11 @@ function EditPayment({ id, onDone }: { id: number; onDone: () => void }) {
           </div>
         </fieldset>
         <label className="field">
-          <span>Note <small className="hint">(optional)</small></span>
-          <input maxLength={120} value={note} onChange={(e) => setNote(e.target.value)} />
+          <span>Note <span className="hint-opt">(optional)</span></span>
+          <span className="input-icon">
+            <Icon name="note" size={18} />
+            <input maxLength={120} value={note} onChange={(e) => setNote(e.target.value)} />
+          </span>
         </label>
         {s.reversed.has(p.id) && (
           <p className="hint">This payment was undone. Its undo entry will change to match.</p>

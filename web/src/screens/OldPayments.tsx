@@ -6,7 +6,7 @@ import { addDays, dayLabel, isoDate, isValidDate, lagosDate, lagosNoon } from "@
 import type { IsoDate, Plan } from "@shared/types.ts";
 import { addPayments, type Method, METHODS } from "../api.ts";
 import { useStore } from "../store.tsx";
-import { Avatar, go, Icon, TopBar } from "../ui.tsx";
+import { Avatar, DateTile, go, Icon, TopBar } from "../ui.tsx";
 import { Done } from "./Done.tsx";
 
 // Payments she took on WhatsApp before the app existed. She can type each one
@@ -175,10 +175,10 @@ function OldPaymentsForm({ customerId }: { customerId: number }) {
         <div>
           <p className="list-title">{c.name}</p>
           <p className="list-sub">
-            <span className="cap">{c.plan}</span> · started {dayLabel(c.start_date)} ·{" "}
-            <a href={`#/customers/${c.id}`}>change</a>
+            <span className="cap">{c.plan}</span> · started {dayLabel(c.start_date)}
           </p>
         </div>
+        <a className="change" href="#/old">Change</a>
       </div>
 
       <div className="segmented segmented-2" role="radiogroup" aria-label="How to enter">
@@ -209,9 +209,9 @@ function OldPaymentsForm({ customerId }: { customerId: number }) {
                       <input inputMode="numeric" aria-label={`Payment ${i + 1} amount`} value={l.amount}
                         onChange={(e) => setLine(l.key, { amount: e.target.value })} />
                     </div>
-                    <button className="icon-btn icon-btn-sm" aria-label={`Remove payment ${i + 1}`} disabled={lines.length === 1}
+                    <button type="button" className="icon-btn" aria-label={`Remove payment ${i + 1}`} disabled={lines.length === 1}
                       onClick={() => setLines(lines.filter((x) => x.key !== l.key))}>
-                      <Icon name="close" size={16} />
+                      <Icon name="close" size={18} />
                     </button>
                   </li>
                 ))}
@@ -261,7 +261,7 @@ function OldPaymentsForm({ customerId }: { customerId: number }) {
         </button>
       </div>
 
-      <div className="section-head"><h2>Already in the app</h2><span className="muted small-inline">{naira(p.total)}</span></div>
+      <div className="section-head"><h2>Already in the app</h2><span className="muted">{naira(p.total)}</span></div>
       {existing.length === 0
         ? <p className="empty">Nothing recorded for {c.name} yet.</p>
         : (
@@ -269,11 +269,12 @@ function OldPaymentsForm({ customerId }: { customerId: number }) {
             {existing.slice().reverse().map((x) => (
               <li key={x.id}>
                 <a className="list-row" href={`#/payment/${x.id}`}>
+                <DateTile date={lagosDate(x.paid_at)} />
                 <span className="list-main">
                   <span className="list-title">{dayLabel(lagosDate(x.paid_at))}</span>
                   {x.note && <span className="list-sub">{x.note}</span>}
                 </span>
-                <span className="list-amount">+{naira(x.amount)}</span>
+                <span className="list-end"><span className="list-amount">+{naira(x.amount)}</span></span>
                 </a>
               </li>
             ))}

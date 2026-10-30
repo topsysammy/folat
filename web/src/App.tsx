@@ -17,7 +17,7 @@ import { Report } from "./screens/Report.tsx";
 import { Settings } from "./screens/Settings.tsx";
 import { Today } from "./screens/Today.tsx";
 import { StoreProvider } from "./store.tsx";
-import { useRoute } from "./ui.tsx";
+import { TabBar, tabFor, useRoute } from "./ui.tsx";
 
 export function App() {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
@@ -32,8 +32,18 @@ export function App() {
   if (!session) return <Login />;
   return (
     <StoreProvider>
-      <main className="app"><Screen /></main>
+      <Shell />
     </StoreProvider>
+  );
+}
+
+function Shell() {
+  const tab = tabFor(useRoute());
+  return (
+    <>
+      <main className={`app${tab ? " app-tabs" : ""}`}><Screen /></main>
+      {tab && <TabBar active={tab} />}
+    </>
   );
 }
 

@@ -27,6 +27,8 @@ export function AddCustomer() {
   return (
     <>
       <TopBar title="Add customer" />
+      <h2 className="h-big">New customer</h2>
+      <p className="lede">They'll start saving towards the December distribution.</p>
       <CustomerForm
         withStart
         submitLabel="Add customer"

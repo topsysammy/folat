@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { naira } from "@shared/money.ts";
 import { type Row, useStore } from "../store.tsx";
-import { Avatar, go, Icon, StatusPill, TopBar } from "../ui.tsx";
+import { Avatar, go, Icon, PageTitle, StatusPill } from "../ui.tsx";
 
 type Filter = "all" | "behind" | "removed";
 
@@ -15,6 +15,7 @@ export function Customers() {
     : filter === "behind"
     ? s.rows.filter((r) => r.progress.behindBy > 0)
     : s.rows;
+  const removed = s.rowById.size - s.rows.length;
   const needle = q.trim().toLowerCase();
   const digits = needle.replace(/\D/g, "");
   const shown = pool.filter((r) =>
@@ -24,9 +25,10 @@ export function Customers() {
 
   return (
     <>
-      <TopBar
+      <PageTitle
+        eyebrow={`${s.rows.length} active${removed ? ` · ${removed} removed` : ""}`}
         title="Customers"
-        action={<button className="icon-btn icon-btn-soft" onClick={() => go("/add")} aria-label="Add customer"><Icon name="plus" /></button>}
+        action={<button className="icon-btn icon-btn-ink" onClick={() => go("/add")} aria-label="Add customer"><Icon name="plus" /></button>}
       />
       <label className="search">
         <Icon name="search" size={18} />
@@ -36,7 +38,11 @@ export function Customers() {
         {(["all", "behind", "removed"] as Filter[]).map((f) => (
           <button key={f} role="tab" aria-selected={filter === f} className={`chip${filter === f ? " on" : ""}`}
             onClick={() => setFilter(f)}>
-            {f === "all" ? `All · ${s.rows.length}` : f === "behind" ? "Behind" : "Removed"}
+            {f === "all"
+              ? `All · ${s.rows.length}`
+              : f === "behind"
+              ? `Behind · ${s.rows.filter((r) => r.progress.behindBy > 0).length}`
+              : "Removed"}
           </button>
         ))}
       </div>
@@ -63,7 +69,10 @@ export function Customers() {
                       <span className="cap">{c.plan}</span> · {c.active ? <StatusPill p={p} /> : "Removed"}
                     </span>
                   </span>
-                  <span className="list-amount">{naira(p.total)}</span>
+                  <span className="list-end">
+                    <span className="list-amount">{naira(p.total)}</span>
+                    <span className="list-note">paid</span>
+                  </span>
                 </a>
               </li>
             ))}
