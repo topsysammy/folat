@@ -1,0 +1,9 @@
+# Netlify builds the web app from web/. The Supabase URL and key come from
+# Netlify's environment variables (web/.env is not in git).
+[build]
+  base = "web"
+  command = "npm ci && npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
