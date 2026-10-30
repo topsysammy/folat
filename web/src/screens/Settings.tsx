@@ -142,7 +142,7 @@ export function Settings() {
         </>
       )}
 
-      <button className="btn btn-ghost btn-block signout" onClick={() => db.auth.signOut()}>
+      <button className="btn btn-ghost btn-block signout" onClick={() => db.auth.signOut({ scope: "local" })}>
         <Icon name="logout" /> Sign out
       </button>
     </>

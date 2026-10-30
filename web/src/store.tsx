@@ -65,7 +65,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           You're signed in as <b>{noAccess}</b>, which doesn't have access to the records.
         </p>
         <p className="muted">Sign out and sign in with the owner's email.</p>
-        <button className="btn btn-ink" onClick={() => db.auth.signOut()}>Sign out</button>
+        <button className="btn btn-ink" onClick={() => db.auth.signOut({ scope: "local" })}>Sign out</button>
       </div>
     );
   }
@@ -74,7 +74,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       <div className="center-screen">
         <p className="muted">Couldn't load your records: {error}</p>
         <button className="btn btn-ink" onClick={reload}>Try again</button>
-        <button className="btn btn-ghost" onClick={() => db.auth.signOut()}>Sign out</button>
+        <button className="btn btn-ghost" onClick={() => db.auth.signOut({ scope: "local" })}>Sign out</button>
       </div>
     );
   }
