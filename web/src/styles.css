@@ -300,3 +300,12 @@ li.list-row { cursor: default; }
 .small-inline { font-size: 14px; }
 .footnote { text-align: center; margin-top: 18px; }
 .footnote a, .who a { color: var(--ink); font-weight: 600; }
+
+/* ───────── payment page ───────── */
+.review .struck { text-decoration: line-through; color: var(--muted); }
+.review a { color: inherit; }
+.list-link .list-amount { margin-left: auto; }
+.select-wrap { display: flex; align-items: center; gap: 10px; height: 60px; padding: 0 14px 0 8px; border: 1px solid var(--line); border-radius: 18px; }
+.select-wrap .avatar { width: 40px; height: 40px; font-size: 14px; }
+.select-wrap select { flex: 1; min-width: 0; border: 0; background: none; font: 500 16px/1 var(--body); color: var(--ink); outline: none; }
+.select-wrap:focus-within { border-color: var(--ink); }

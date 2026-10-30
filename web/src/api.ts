@@ -145,6 +145,31 @@ export async function addPayments(
   if (error) throw friendly(error);
 }
 
+export async function editPayment(p: {
+  id: number;
+  customerId: number;
+  amount: number;
+  paidAt: string;
+  method: Method;
+  note: string;
+}): Promise<void> {
+  const { error } = await db.rpc("edit_payment", {
+    p_payment_id: p.id,
+    p_customer_id: p.customerId,
+    p_amount: p.amount,
+    p_paid_at: p.paidAt,
+    p_method: p.method,
+    p_note: p.note,
+  });
+  if (error) throw friendly(error);
+}
+
+/** Erases the payment for good (and its undo entry, if it was undone). */
+export async function deletePayment(id: number): Promise<void> {
+  const { error } = await db.rpc("delete_payment", { p_payment_id: id });
+  if (error) throw friendly(error);
+}
+
 export async function undoPayment(paymentId: number): Promise<void> {
   const { error } = await db.rpc("undo_payment", { p_payment_id: paymentId });
   if (error) throw friendly(error);

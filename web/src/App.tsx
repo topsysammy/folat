@@ -10,6 +10,7 @@ import { Login } from "./screens/Login.tsx";
 import { NewSeason } from "./screens/NewSeason.tsx";
 import { OldPayments } from "./screens/OldPayments.tsx";
 import { Owing } from "./screens/Owing.tsx";
+import { PaymentPage } from "./screens/PaymentPage.tsx";
 import { PastSeason } from "./screens/PastSeason.tsx";
 import { RecordPayment } from "./screens/RecordPayment.tsx";
 import { Report } from "./screens/Report.tsx";
@@ -50,6 +51,8 @@ function Screen() {
       return <AddCustomer />;
     case "owing":
       return <Owing key={route} initial={id === "quiet" ? "quiet" : "behind"} />;
+    case "payment":
+      return num ? <PaymentPage key={num} id={num} /> : <Home />;
     case "old":
       return <OldPayments key={route} customerId={num} />;
     case "today":

@@ -61,7 +61,7 @@ export function Today() {
               const c = s.rowById.get(p.customer_id)?.customer;
               return (
                 <li key={p.id}>
-                  <a className="list-row" href={`#/customers/${p.customer_id}`}>
+                  <a className="list-row" href={`#/payment/${p.id}`}>
                     <Avatar name={c?.name ?? "?"} />
                     <span className="list-main">
                       <span className="list-title">{c?.name ?? "Unknown"}</span>

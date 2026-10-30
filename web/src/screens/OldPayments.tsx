@@ -267,12 +267,14 @@ function OldPaymentsForm({ customerId }: { customerId: number }) {
         : (
           <ul className="list">
             {existing.slice().reverse().map((x) => (
-              <li key={x.id} className="list-row">
+              <li key={x.id}>
+                <a className="list-row" href={`#/payment/${x.id}`}>
                 <span className="list-main">
                   <span className="list-title">{dayLabel(lagosDate(x.paid_at))}</span>
                   {x.note && <span className="list-sub">{x.note}</span>}
                 </span>
                 <span className="list-amount">+{naira(x.amount)}</span>
+                </a>
               </li>
             ))}
           </ul>

@@ -144,6 +144,7 @@ export function CustomerPage({ id }: { id: number }) {
               const reversed = s.reversed.has(x.id);
               return (
                 <li key={x.id} className="list-row">
+                  <a className="list-link" href={`#/payment/${x.id}`}>
                   <span className="list-main">
                     <span className="list-title">{dayLabel(lagosDate(x.paid_at))}</span>
                     <span className="list-sub">
@@ -159,6 +160,7 @@ export function CustomerPage({ id }: { id: number }) {
                   <span className={`list-amount${x.amount < 0 ? " neg" : ""}${reversed ? " struck" : ""}`}>
                     {x.amount > 0 ? "+" : ""}{naira(x.amount)}
                   </span>
+                  </a>
                   {x.source !== "undo" && !reversed && (
                     <button className="icon-btn icon-btn-soft icon-btn-sm" disabled={busy}
                       onClick={() => undo(x.id, x.amount, x.paid_at)} aria-label={`Undo ${naira(x.amount)} payment`}>

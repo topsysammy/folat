@@ -142,7 +142,7 @@ export function Home() {
               const undone = p.source === "undo" || s.reversed.has(p.id);
               return (
                 <li key={p.id}>
-                  <a className="list-row" href={`#/customers/${p.customer_id}`}>
+                  <a className="list-row" href={`#/payment/${p.id}`}>
                     <Avatar name={c?.name ?? "?"} dim={undone} />
                     <span className="list-main">
                       <span className="list-title">{c?.name ?? "Unknown"}</span>
