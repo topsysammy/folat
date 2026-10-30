@@ -285,3 +285,18 @@ li.list-row { cursor: default; }
 .dist-item .list-row { padding-bottom: 12px; }
 .dist-form { display: grid; gap: 10px; padding: 0 0 14px 56px; }
 .row-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+
+/* ───────── old payments ───────── */
+.lines { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.lines li { display: grid; grid-template-columns: 18px minmax(0, 1.15fr) minmax(0, 1fr) 34px; gap: 8px; align-items: center; }
+.line-num { color: var(--muted); font-size: 13px; text-align: right; }
+.lines input[type="date"] {
+  height: 52px; padding: 0 10px; border-radius: 16px; border: 1px solid var(--line); background: var(--paper);
+  font: inherit; font-size: 15px; color: var(--ink); width: 100%; min-width: 0; appearance: none; -webkit-appearance: none;
+}
+.lines input[type="date"]:focus { outline: none; border-color: var(--ink); }
+.lines .amount-input input { flex: 1; min-width: 0; border: 0; outline: none; background: none; font: 600 17px/1 var(--body); color: var(--ink); }
+.lines .amount-input { padding: 0 12px; }
+.small-inline { font-size: 14px; }
+.footnote { text-align: center; margin-top: 18px; }
+.footnote a, .who a { color: var(--ink); font-weight: 600; }

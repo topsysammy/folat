@@ -98,7 +98,7 @@ export async function addCustomer(c: { name: string; phone: string; plan: Plan; 
 
 export async function updateCustomer(
   id: number,
-  set: Partial<Pick<Customer, "name" | "phone" | "plan" | "active">>,
+  set: Partial<Pick<Customer, "name" | "phone" | "plan" | "start_date" | "active">>,
 ): Promise<void> {
   const { error } = await db.from("customers").update(set).eq("id", id);
   if (error) throw friendly(error);
@@ -125,6 +125,24 @@ export async function addPayment(p: {
     .single();
   if (error) throw friendly(error);
   return data.id;
+}
+
+/** Several past payments for one customer, saved together: all of them or none. */
+export async function addPayments(
+  customerId: number,
+  rows: { amount: number; paidAt: string; method: Method; note: string }[],
+): Promise<void> {
+  const { error } = await db.from("payments").insert(
+    rows.map((r) => ({
+      customer_id: customerId,
+      amount: r.amount,
+      paid_at: r.paidAt,
+      method: r.method,
+      note: r.note.trim() || null,
+      source: "admin",
+    })),
+  );
+  if (error) throw friendly(error);
 }
 
 export async function undoPayment(paymentId: number): Promise<void> {

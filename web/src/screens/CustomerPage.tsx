@@ -56,9 +56,10 @@ export function CustomerPage({ id }: { id: number }) {
         <TopBar title="Edit customer" fallback={`/customers/${id}`} />
         <CustomerForm
           customer={c}
+          withStart
           submitLabel="Save changes"
           onSubmit={async (v) => {
-            await updateCustomer(id, { name: v.name, phone: v.phone, plan: v.plan });
+            await updateCustomer(id, { name: v.name, phone: v.phone, plan: v.plan, start_date: v.start_date });
             await s.reload();
             setEditing(false);
           }}
@@ -131,7 +132,10 @@ export function CustomerPage({ id }: { id: number }) {
       </a>
       {error && <p className="error" role="alert">{error}</p>}
 
-      <div className="section-head"><h2>History</h2></div>
+      <div className="section-head">
+        <h2>History</h2>
+        {c.active && <a href={`#/old/${id}`}>+ Old payments</a>}
+      </div>
       {history.length === 0
         ? <p className="empty">No payments yet.</p>
         : (

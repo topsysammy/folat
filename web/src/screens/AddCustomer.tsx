@@ -16,7 +16,9 @@ export function AddCustomer() {
       <Done
         title={`${added.name} added`}
         body={`${added.plan[0].toUpperCase()}${added.plan.slice(1)} plan, ${naira(planAmount(s.settings, added.plan))} each time.`}
-        primary={{ label: "Record their first payment", onClick: () => go(`/pay/${added.id}`) }}
+        primary={added.start_date < s.today
+          ? { label: "Add their payments from before today", onClick: () => go(`/old/${added.id}`) }
+          : { label: "Record their first payment", onClick: () => go(`/pay/${added.id}`) }}
         secondary={{ label: "Back to home", onClick: () => go("/") }}
       />
     );

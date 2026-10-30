@@ -8,6 +8,7 @@ import { Distribution } from "./screens/Distribution.tsx";
 import { Home } from "./screens/Home.tsx";
 import { Login } from "./screens/Login.tsx";
 import { NewSeason } from "./screens/NewSeason.tsx";
+import { OldPayments } from "./screens/OldPayments.tsx";
 import { Owing } from "./screens/Owing.tsx";
 import { PastSeason } from "./screens/PastSeason.tsx";
 import { RecordPayment } from "./screens/RecordPayment.tsx";
@@ -49,6 +50,8 @@ function Screen() {
       return <AddCustomer />;
     case "owing":
       return <Owing key={route} initial={id === "quiet" ? "quiet" : "behind"} />;
+    case "old":
+      return <OldPayments key={route} customerId={num} />;
     case "today":
       return <Today />;
     case "distribution":

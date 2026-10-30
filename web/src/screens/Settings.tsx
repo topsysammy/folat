@@ -111,6 +111,10 @@ export function Settings() {
         </button>
       </form>
 
+      <div className="section-head"><h2>Payments from before the app</h2></div>
+      <p className="hint">Add what customers paid on WhatsApp before she started using the app.</p>
+      <button className="btn btn-ghost btn-block gap-top" onClick={() => go("/old")}>Add old payments</button>
+
       <div className="section-head"><h2>Season</h2></div>
       <dl className="facts">
         <div><dt>Current season</dt><dd>{s.season.name}</dd></div>

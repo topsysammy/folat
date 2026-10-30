@@ -51,6 +51,9 @@ function PickCustomer() {
             ))}
           </ul>
         )}
+      <p className="hint footnote">
+        Payments from before the app? <a href="#/old">Add old payments</a>
+      </p>
     </>
   );
 }
