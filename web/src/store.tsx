@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { livePayments, type Progress, progress, totalsByCustomer } from "@shared/progress.ts";
 import { daysBetween, lagosDate } from "@shared/time.ts";
 import type { Customer, IsoDate, Payment } from "@shared/types.ts";
-import { type Data, type Distribution, loadData, type Season } from "./api.ts";
+import { type Data, db, type Distribution, loadData, NoAccessError, type Season } from "./api.ts";
 
 /** A customer counts as "stopped paying" after this many days without a payment. */
 export const QUIET_DAYS = 14;
@@ -38,12 +38,17 @@ export function useStore(): Store {
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<Data | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [noAccess, setNoAccess] = useState<string | null>(null); // signed-in email that isn't the owner's
 
   const reload = async () => {
     try {
       setData(await loadData());
       setError(null);
     } catch (e) {
+      if (e instanceof NoAccessError) {
+        const { data } = await db.auth.getSession();
+        setNoAccess(data.session?.user.email ?? "this account");
+      }
       setError((e as Error).message);
     }
   };
@@ -53,11 +58,23 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const store = useMemo(() => (data ? derive(data, reload) : null), [data]);
 
+  if (noAccess && !store) {
+    return (
+      <div className="center-screen">
+        <p>
+          You're signed in as <b>{noAccess}</b>, which doesn't have access to the records.
+        </p>
+        <p className="muted">Sign out and sign in with the owner's email.</p>
+        <button className="btn btn-ink" onClick={() => db.auth.signOut()}>Sign out</button>
+      </div>
+    );
+  }
   if (error && !store) {
     return (
       <div className="center-screen">
         <p className="muted">Couldn't load your records: {error}</p>
         <button className="btn btn-ink" onClick={reload}>Try again</button>
+        <button className="btn btn-ghost" onClick={() => db.auth.signOut()}>Sign out</button>
       </div>
     );
   }

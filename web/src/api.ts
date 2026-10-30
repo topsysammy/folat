@@ -41,11 +41,19 @@ export interface Data {
   distributions: Distribution[]; // this season
 }
 
+export class NoAccessError extends Error {
+  constructor() {
+    super("This account doesn't have access to the records.");
+  }
+}
+
 const PAYMENT_COLUMNS = "id, customer_id, amount, source, reverses_payment_id, paid_at, method, note";
 
 export async function loadData(): Promise<Data> {
-  const settings = await db.from("settings").select("*").eq("id", 1).single();
+  const settings = await db.from("settings").select("*").eq("id", 1).maybeSingle();
   if (settings.error) throw settings.error;
+  // The rules hide everything from accounts other than the owner's, so no row means "not allowed".
+  if (!settings.data) throw new NoAccessError();
   const season = settings.data.current_season_id as number;
   const [seasons, customers, payments, distributions] = await Promise.all([
     db.from("seasons").select("id, name, started_on, distribution_date, closed_at").order("id", { ascending: false }),
