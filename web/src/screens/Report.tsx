@@ -1,6 +1,5 @@
 import { naira } from "@shared/money.ts";
 import { dayLabel, shortDate } from "@shared/time.ts";
-import { db } from "../api.ts";
 import { downloadCsv } from "../download.ts";
 import { mostBehindFirst, useStore } from "../store.tsx";
 import { Icon, TopBar } from "../ui.tsx";
@@ -40,10 +39,6 @@ export function Report() {
       <div className="section-head"><h2>Backup</h2></div>
       <p className="muted small">Download every customer and payment as a spreadsheet. Do this once a week and keep the file safe.</p>
       <button className="btn btn-ink btn-block" onClick={() => downloadCsv(s)}><Icon name="download" /> Export CSV</button>
-
-      <button className="btn btn-ghost btn-block signout" onClick={() => db.auth.signOut()}>
-        <Icon name="logout" /> Sign out
-      </button>
     </>
   );
 }

@@ -4,11 +4,16 @@ import { db } from "./api.ts";
 import { AddCustomer } from "./screens/AddCustomer.tsx";
 import { CustomerPage } from "./screens/CustomerPage.tsx";
 import { Customers } from "./screens/Customers.tsx";
+import { Distribution } from "./screens/Distribution.tsx";
 import { Home } from "./screens/Home.tsx";
 import { Login } from "./screens/Login.tsx";
+import { NewSeason } from "./screens/NewSeason.tsx";
 import { Owing } from "./screens/Owing.tsx";
+import { PastSeason } from "./screens/PastSeason.tsx";
 import { RecordPayment } from "./screens/RecordPayment.tsx";
 import { Report } from "./screens/Report.tsx";
+import { Settings } from "./screens/Settings.tsx";
+import { Today } from "./screens/Today.tsx";
 import { StoreProvider } from "./store.tsx";
 import { useRoute } from "./ui.tsx";
 
@@ -43,7 +48,17 @@ function Screen() {
     case "add":
       return <AddCustomer />;
     case "owing":
-      return <Owing />;
+      return <Owing key={route} initial={id === "quiet" ? "quiet" : "behind"} />;
+    case "today":
+      return <Today />;
+    case "distribution":
+      return <Distribution />;
+    case "settings":
+      return <Settings />;
+    case "season":
+      return <NewSeason />;
+    case "seasons":
+      return num ? <PastSeason key={num} id={num} /> : <Settings />;
     case "report":
       return <Report />;
     default:

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { naira } from "@shared/money.ts";
 import { daysBetween, lagosDate, shortDate } from "@shared/time.ts";
-import { downloadCsv } from "../download.ts";
-import { mostBehindFirst, useStore } from "../store.tsx";
+import { mostBehindFirst, QUIET_DAYS, stoppedPaying, useStore } from "../store.tsx";
+import { collectedIn } from "./Today.tsx";
 import { Avatar, go, Icon, Segments } from "../ui.tsx";
 
 const HIDE_KEY = "hideTotal";
@@ -32,6 +32,10 @@ export function Home() {
   const daysLeft = Math.max(daysBetween(s.today, s.settings.distribution_date), 0);
   const behind = mostBehindFirst(s.rows);
   const onTrack = s.rows.filter((r) => r.progress.onTrack).length;
+  const quiet = stoppedPaying(s.rows, s.today);
+  const today = collectedIn(s, "today");
+  const week = collectedIn(s, "week");
+  const sum = (list: { amount: number }[]) => list.reduce((t, p) => t + p.amount, 0);
   const recent = s.payments.slice(-6).reverse();
 
   return (
@@ -41,10 +45,15 @@ export function Home() {
           <p className="muted">{greeting()},</p>
           <p className="home-name">Folat Place</p>
         </div>
-        <button className="icon-btn icon-btn-soft" onClick={() => go("/owing")} aria-label="Who's behind">
-          <Icon name="bell" />
-          {behind.length > 0 && <span className="dot" />}
-        </button>
+        <div className="head-actions">
+          <button className="icon-btn icon-btn-soft" onClick={() => go("/owing")} aria-label="Follow up">
+            <Icon name="bell" />
+            {(behind.length > 0 || quiet.length > 0) && <span className="dot" />}
+          </button>
+          <button className="icon-btn icon-btn-soft" onClick={() => go("/settings")} aria-label="Settings">
+            <Icon name="gear" />
+          </button>
+        </div>
       </header>
 
       <section className="hero-card">
@@ -70,6 +79,20 @@ export function Home() {
         </div>
       </section>
 
+      <a className="today-card" href="#/today">
+        <span>
+          <span className="tile-label">Today</span>
+          <span className="today-amount">{hidden ? "₦ • • •" : naira(sum(today))}</span>
+          <span className="tile-sub">{today.length} payment{today.length === 1 ? "" : "s"}</span>
+        </span>
+        <span>
+          <span className="tile-label">This week</span>
+          <span className="today-amount">{hidden ? "₦ • • •" : naira(sum(week))}</span>
+          <span className="tile-sub">{week.length} payment{week.length === 1 ? "" : "s"}</span>
+        </span>
+        <Icon name="chevron" />
+      </a>
+
       <div className="section-head">
         <h2>Customers</h2>
         <a href="#/customers">View all</a>
@@ -92,12 +115,21 @@ export function Home() {
         </button>
       </div>
 
+      {quiet.length > 0 && (
+        <a className="notice notice-link" href="#/owing/quiet">
+          <span>
+            <b>{quiet.length} {quiet.length === 1 ? "customer hasn't" : "customers haven't"}</b> paid in {QUIET_DAYS}+ days
+          </span>
+          <Icon name="chevron" />
+        </a>
+      )}
+
       <div className="section-head"><h2>Quick actions</h2></div>
       <nav className="quick">
         <a href="#/customers"><span className="quick-icon"><Icon name="users" /></span>Customers</a>
-        <a href="#/owing"><span className="quick-icon"><Icon name="chat" /></span>Remind</a>
+        <a href="#/owing"><span className="quick-icon"><Icon name="chat" /></span>Follow up</a>
+        <a href="#/distribution"><span className="quick-icon"><Icon name="gift" /></span>Distribution</a>
         <a href="#/report"><span className="quick-icon"><Icon name="chart" /></span>Report</a>
-        <button onClick={() => downloadCsv(s)}><span className="quick-icon"><Icon name="download" /></span>Export</button>
       </nav>
 
       <div className="section-head"><h2>Recent payments</h2></div>

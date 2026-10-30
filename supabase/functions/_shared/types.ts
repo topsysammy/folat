@@ -31,6 +31,8 @@ export interface Payment {
   source: string;
   reverses_payment_id: number | null;
   paid_at: string; // ISO timestamp (UTC)
+  method?: string | null; // web app: cash / transfer / pos / other
+  note?: string | null;
 }
 
 export interface Pending {

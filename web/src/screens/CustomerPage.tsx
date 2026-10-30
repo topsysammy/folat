@@ -3,7 +3,8 @@ import { reminderLink } from "@shared/admin/commands/report.ts";
 import { localPhone, naira } from "@shared/money.ts";
 import { planAmount } from "@shared/progress.ts";
 import { dayLabel, lagosDate, shortDate } from "@shared/time.ts";
-import { undoPayment, updateCustomer } from "../api.ts";
+import { METHODS, undoPayment, updateCustomer } from "../api.ts";
+import { statementLink } from "../messages.ts";
 import { useStore } from "../store.tsx";
 import { CustomerForm } from "./CustomerForm.tsx";
 import { go, Icon, Segments, StatusPill, TopBar } from "../ui.tsx";
@@ -25,6 +26,7 @@ export function CustomerPage({ id }: { id: number }) {
   }
   const { customer: c, progress: p } = row;
   const history = s.payments.filter((x) => x.customer_id === id).reverse();
+  const lastPayment = s.live.filter((x) => x.customer_id === id).sort((a, b) => a.paid_at.localeCompare(b.paid_at)).at(-1);
 
   const run = async (fn: () => Promise<void>) => {
     setBusy(true);
@@ -123,6 +125,10 @@ export function CustomerPage({ id }: { id: number }) {
         <div><dt>Started</dt><dd>{dayLabel(c.start_date)}</dd></div>
         <div><dt>Phone</dt><dd><a href={`tel:${localPhone(c.phone)}`}>{localPhone(c.phone)}</a></dd></div>
       </dl>
+      <a className="btn btn-ghost btn-block share" href={statementLink(row, s.settings.target, lastPayment)}
+        target="_blank" rel="noreferrer">
+        <Icon name="chat" /> Send statement on WhatsApp
+      </a>
       {error && <p className="error" role="alert">{error}</p>}
 
       <div className="section-head"><h2>History</h2></div>
@@ -137,7 +143,13 @@ export function CustomerPage({ id }: { id: number }) {
                   <span className="list-main">
                     <span className="list-title">{dayLabel(lagosDate(x.paid_at))}</span>
                     <span className="list-sub">
-                      {x.source === "undo" ? "Undo of an earlier payment" : reversed ? "Undone" : "Payment"}
+                      {x.source === "undo"
+                        ? "Undo of an earlier payment"
+                        : [
+                          reversed ? "Undone" : "Payment",
+                          METHODS.find((m) => m.value === x.method)?.label,
+                          x.note && `“${x.note}”`,
+                        ].filter(Boolean).join(" · ")}
                     </span>
                   </span>
                   <span className={`list-amount${x.amount < 0 ? " neg" : ""}${reversed ? " struck" : ""}`}>

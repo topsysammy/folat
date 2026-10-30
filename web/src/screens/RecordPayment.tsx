@@ -4,7 +4,7 @@ import { parseAmount } from "@shared/parse/amount.ts";
 import { planAmount } from "@shared/progress.ts";
 import { dayLabel, lagosNoon } from "@shared/time.ts";
 import type { IsoDate } from "@shared/types.ts";
-import { addPayment, undoPayment } from "../api.ts";
+import { addPayment, type Method, METHODS, undoPayment } from "../api.ts";
 import { useStore } from "../store.tsx";
 import { Avatar, go, Icon, TopBar } from "../ui.tsx";
 import { Done } from "./Done.tsx";
@@ -62,6 +62,8 @@ function PaymentForm({ customerId }: { customerId: number }) {
   const { customer: c, progress: p } = s.rowById.get(customerId)!;
   const [amountText, setAmountText] = useState(String(planAmount(s.settings, c.plan)));
   const [date, setDate] = useState<IsoDate>(s.today);
+  const [method, setMethod] = useState<Method>("cash");
+  const [note, setNote] = useState("");
   const [step, setStep] = useState<Step>({ kind: "form" });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -80,7 +82,7 @@ function PaymentForm({ customerId }: { customerId: number }) {
     setError(null);
     try {
       const paidAt = date === s.today ? new Date().toISOString() : lagosNoon(date);
-      const paymentId = await addPayment(c.id, amount, paidAt);
+      const paymentId = await addPayment({ customerId: c.id, amount, paidAt, method, note });
       await s.reload();
       setStep({ kind: "done", amount, paymentId });
     } catch (err) {
@@ -140,6 +142,21 @@ function PaymentForm({ customerId }: { customerId: number }) {
               <span>Date paid</span>
               <input type="date" max={s.today} value={date} onChange={(e) => setDate(e.target.value)} />
             </label>
+            <fieldset className="field">
+              <legend>How they paid</legend>
+              <div className="chips chips-fill">
+                {METHODS.map((m) => (
+                  <button type="button" key={m.value} className={`chip${method === m.value ? " on" : ""}`}
+                    aria-pressed={method === m.value} onClick={() => setMethod(m.value)}>
+                    {m.label}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+            <label className="field">
+              <span>Note <small className="hint">(optional)</small></span>
+              <input maxLength={120} placeholder="e.g. paid by her son" value={note} onChange={(e) => setNote(e.target.value)} />
+            </label>
             {error && <p className="error" role="alert">{error}</p>}
             <button className="btn btn-ink btn-block">Continue</button>
           </form>
@@ -150,6 +167,10 @@ function PaymentForm({ customerId }: { customerId: number }) {
               <p className="eyebrow">Check before saving</p>
               <p className="review-amount">{naira(step.amount)}</p>
               <p>from <b>{c.name}</b> on <b>{date === s.today ? "today" : dayLabel(date)}</b></p>
+              <p className="muted">
+                {METHODS.find((m) => m.value === method)?.label}
+                {note.trim() && <> · “{note.trim()}”</>}
+              </p>
               <p className="muted">New total: {naira(p.total + step.amount)}</p>
             </section>
             {error && <p className="error" role="alert">{error}</p>}

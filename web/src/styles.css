@@ -243,3 +243,45 @@ li.list-row { cursor: default; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; }
 }
+
+/* ───────── round 2: today, settings, distribution ───────── */
+.head-actions { display: flex; gap: 8px; }
+.gap-top { margin-top: 14px; }
+.ok { color: var(--good); background: var(--good-bg); padding: 10px 14px; border-radius: 14px; font-size: 14px; }
+
+.today-card {
+  display: grid; grid-template-columns: 1fr 1fr auto; align-items: center; gap: 12px;
+  margin-top: 14px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 20px;
+  text-decoration: none;
+}
+.today-card > span { display: grid; gap: 2px; min-width: 0; }
+.today-card > span + span { border-left: 1px solid var(--line); padding-left: 14px; }
+.today-card svg { color: var(--muted); }
+.today-amount { font: 700 20px/1.2 var(--display); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.notice-link { text-decoration: none; margin: 12px 0 0; padding: 14px 16px; }
+.notice-link b { font-weight: 600; }
+
+.summary { border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; display: grid; gap: 4px; margin: 6px 0 8px; }
+.eyebrow-dark { font-size: 13px; color: var(--muted); }
+.summary-amount { font: 700 34px/1.1 var(--display); letter-spacing: -.02em; }
+.split { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 6px; font-size: 14px; color: var(--muted); }
+.split b { color: var(--ink); font-weight: 600; }
+
+.chips-fill { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0; }
+.chips-fill .chip { padding: 10px 4px; }
+
+.amount-input-sm { height: 52px; border-radius: 16px; }
+.amount-input-sm span { font-size: 18px; }
+.field .amount-input-sm input { font: 600 18px/1 var(--body); }
+
+.segmented-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.segmented-2 label { text-align: left; padding: 12px 14px; }
+.review-left { text-align: left; }
+.review-left p + p { margin-top: 4px; }
+
+.share { margin-top: 12px; }
+
+.dist-item .list-row { padding-bottom: 12px; }
+.dist-form { display: grid; gap: 10px; padding: 0 0 14px 56px; }
+.row-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
