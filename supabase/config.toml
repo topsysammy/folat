@@ -1,0 +1,6 @@
+project_id = "savings-bot"
+
+# Meta calls the webhook without a Supabase JWT. Requests are authenticated
+# with Meta's X-Hub-Signature-256 instead (see _shared/signature.ts).
+[functions.whatsapp-webhook]
+verify_jwt = false

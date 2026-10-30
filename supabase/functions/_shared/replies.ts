@@ -1,0 +1,55 @@
+// Every word the bot says lives here so wording can be changed in one place.
+
+export const EXAMPLES = {
+  paid: "paid Tunde 3500",
+  paidOn: "paid Tunde 3500 on 2 oct",
+  add: "add Chioma weekly 08012345678",
+  addFrom: "add Chioma weekly 08012345678 from 1 oct",
+  editPlan: "edit Tunde plan monthly",
+  editPhone: "edit Tunde phone 08098765432",
+  rename: "rename Tunde to Tunde Adeyemi",
+  remove: "remove Chioma",
+  history: "history Tunde",
+};
+
+export const HELP = [
+  "*What I can do* 📒",
+  "",
+  "*Record*",
+  `• ${EXAMPLES.paid}`,
+  `• ${EXAMPLES.paidOn}`,
+  "• undo",
+  "",
+  "*Customers*",
+  `• ${EXAMPLES.add}`,
+  `• ${EXAMPLES.addFrom}`,
+  `• ${EXAMPLES.editPlan}`,
+  `• ${EXAMPLES.editPhone}`,
+  `• ${EXAMPLES.rename}`,
+  `• ${EXAMPLES.remove}`,
+  "• customers",
+  "",
+  "*Check*",
+  "• Tunde  (just the name)",
+  `• ${EXAMPLES.history}`,
+  "• owing",
+  "• today / week / month",
+  "• report",
+  "",
+  "*Records*",
+  "• export",
+].join("\n");
+
+export const R = {
+  unknown: "I didn't get that. Send *help* to see what I can do.",
+  failed: "Something went wrong, nothing was saved. Please try again.",
+  expired: "That request expired. Please send it again.",
+  nothingPending: "There's nothing waiting for an answer. Send *help* to see what I can do.",
+  cancelled: "OK, cancelled. Nothing was saved.",
+  yesOrNo: "Please reply YES or NO.",
+  textOnly: "I can only read text messages. Send *help* to see what I can do.",
+  nothingToUndo: "There's nothing to undo.",
+  noCustomers: "You have no customers yet. Add one like: " + EXAMPLES.add,
+  pickNumber: (n: number) => `Please reply with a number from 1 to ${n}, or NO to cancel.`,
+  confirm: (question: string) => `${question} Reply YES or NO`,
+};

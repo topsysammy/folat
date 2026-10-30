@@ -1,0 +1,12 @@
+{
+  "tasks": {
+    "test": "deno test tests/",
+    "check": "deno check supabase/functions/whatsapp-webhook/index.ts tests/"
+  },
+  "compilerOptions": {
+    "strict": true
+  },
+  "lint": {
+    "rules": { "exclude": ["no-import-prefix"] }
+  }
+}
