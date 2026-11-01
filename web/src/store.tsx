@@ -20,7 +20,7 @@ export interface Store extends Data {
   season: Season;
   rows: Row[]; // active customers
   rowById: Map<number, Row>; // every customer, removed included
-  collected: number;
+  collected: number; // active customers only: removing someone takes their savings out of the totals
   live: Payment[]; // payments that still count (no undo rows, nothing undone)
   reversed: Set<number>; // ids of payments that were undone
   distByCustomer: Map<number, Distribution>;
@@ -102,13 +102,14 @@ function derive(data: Data, reload: () => Promise<void>): Store {
       lastPaid: lastPaid.get(customer.id) ?? null,
     });
   }
+  const rows = [...rowById.values()].filter((r) => r.customer.active);
   return {
     ...data,
     today,
     season: data.seasons.find((s) => s.id === data.settings.current_season_id) ?? data.seasons[0],
-    rows: [...rowById.values()].filter((r) => r.customer.active),
+    rows,
     rowById,
-    collected: data.payments.reduce((s, p) => s + p.amount, 0),
+    collected: rows.reduce((s, r) => s + r.progress.total, 0),
     live,
     reversed: new Set(data.payments.filter((p) => p.source !== "undo" && !liveIds.has(p.id)).map((p) => p.id)),
     distByCustomer: new Map(data.distributions.map((d) => [d.customer_id, d])),

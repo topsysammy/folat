@@ -10,10 +10,11 @@ const METHOD_TINT: Record<string, string> = { cash: "#d9eedf", transfer: "#dbe5f
 
 type Range = "today" | "week" | "season";
 
-/** Payments that still count, received in the range (by the date she says they paid). */
+/** Payments that still count from active customers, received in the range (by the date she says they paid). */
 export function collectedIn(s: Store, range: Range): Payment[] {
   const from = range === "today" ? s.today : range === "week" ? weekStart(s.today) : "0000-01-01";
   return s.live.filter((p) => {
+    if (!s.rowById.get(p.customer_id)?.customer.active) return false; // removed customers don't count
     const d = lagosDate(p.paid_at);
     return d >= from && d <= s.today;
   });

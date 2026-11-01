@@ -35,7 +35,7 @@ export function Home() {
   const quiet = stoppedPaying(s.rows, s.today);
   const today = collectedIn(s, "today");
   const todaySum = today.reduce((t, p) => t + p.amount, 0);
-  const recent = s.payments.slice(-5).reverse();
+  const recent = s.payments.filter((p) => s.rowById.get(p.customer_id)?.customer.active).slice(-5).reverse();
   const pct = goal > 0 ? Math.min(100, Math.round((s.collected / goal) * 100)) : 0;
   const quietNames = quiet.slice(0, 2).map((r) => r.customer.name.split(" ")[0]);
 
